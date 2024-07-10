@@ -74,6 +74,6 @@ class BadgeProductAssigmentProcessor implements MessageProcessorInterface, Topic
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::RESOLVE_BADGE_ASSIGNED_PRODUCTS];
+        return [\Summa\Bundle\BadgeBundle\Async\Topic\ResolveBadgeAssignedProductsTopic::getName()];
     }
 }

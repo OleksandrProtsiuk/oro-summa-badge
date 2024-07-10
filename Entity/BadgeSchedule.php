@@ -6,41 +6,37 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\CronBundle\Entity\ScheduleIntervalInterface;
 use Oro\Bundle\CronBundle\Entity\ScheduleIntervalTrait;
 
-/**
- * @ORM\Table(name="summa_badge_schedule")
- * @ORM\Entity(repositoryClass="Summa\Bundle\BadgeBundle\Entity\Repository\BadgeScheduleRepository")
- */
+#[ORM\Entity(repositoryClass: \Summa\Bundle\BadgeBundle\Entity\Repository\BadgeScheduleRepository::class)]
+#[ORM\Table(name: 'summa_badge_schedule')]
 class BadgeSchedule implements ScheduleIntervalInterface
 {
     use ScheduleIntervalTrait;
 
     /**
      * @var int
-     *
-     * @ORM\Id
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     protected $id;
 
     /**
      * @var Badge
-     *
-     * @ORM\ManyToOne(targetEntity="Summa\Bundle\BadgeBundle\Entity\Badge", inversedBy="schedules")
-     * @ORM\JoinColumn(name="badge_id", referencedColumnName="id", onDelete="CASCADE")
      */
+    #[ORM\ManyToOne(targetEntity: \Summa\Bundle\BadgeBundle\Entity\Badge::class, inversedBy: 'schedules')]
+    #[ORM\JoinColumn(name: 'badge_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     protected $badge;
 
     /**
      * @var \DateTime|null
-     * @ORM\Column(name="active_at", type="datetime", nullable=true)
      */
+    #[ORM\Column(name: 'active_at', type: 'datetime', nullable: true)]
     protected $activeAt;
 
     /**
      * @var \DateTime|null
-     * @ORM\Column(name="deactivate_at", type="datetime", nullable=true)
      */
+    #[ORM\Column(name: 'deactivate_at', type: 'datetime', nullable: true)]
     protected $deactivateAt;
 
     /**

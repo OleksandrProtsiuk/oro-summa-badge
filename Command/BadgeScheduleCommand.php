@@ -14,17 +14,13 @@ use Summa\Bundle\BadgeBundle\Entity\Badge;
 /**
  * Execute update or remove Product-Badge for Badges with conditions
  */
-class BadgeScheduleCommand extends Command implements CronCommandInterface
+#[\Symfony\Component\Console\Attribute\AsCommand('oro:cron:badge:schedule', 'Execute update or remove Product-Badge for Badges with conditions')]
+class BadgeScheduleCommand extends Command implements \Oro\Bundle\CronBundle\Command\CronCommandActivationInterface, \Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface
 {
-    /** @var string */
-    protected static $defaultName = 'oro:cron:badge:schedule';
-
     /** @var ManagerRegistry */
     private $registry;
-
     /** @var MessageProducerInterface */
     protected $messageProducer;
-
     /**
      * @param ManagerRegistry $registry
      * @param MessageProducerInterface $messageProducer
@@ -37,15 +33,12 @@ class BadgeScheduleCommand extends Command implements CronCommandInterface
         $this->messageProducer = $messageProducer;
         parent::__construct();
     }
-
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        $this->setDescription('Execute update or remove Product-Badge for Badges with conditions');
     }
-
     /**
      * {@inheritdoc}
      */
@@ -56,11 +49,10 @@ class BadgeScheduleCommand extends Command implements CronCommandInterface
 
         return true;
     }
-
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $badgesToProcess = $this->registry
             ->getManagerForClass(Badge::class)
@@ -69,18 +61,18 @@ class BadgeScheduleCommand extends Command implements CronCommandInterface
 
         foreach ($badgesToProcess as $badge){
             $this->messageProducer->send(
-                Topics::RESOLVE_BADGE_ASSIGNED_PRODUCTS,
+                \Summa\Bundle\BadgeBundle\Async\Topic\ResolveBadgeAssignedProductsTopic::getName(),
                 [
                     'badge_id' => $badge->getId()
                 ]
             );
         }
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
-
     /**
      * {@inheritDoc}
      */
-    public function getDefaultDefinition()
+    public function getDefaultDefinition(): string
     {
         return '0 * * * *';
     }

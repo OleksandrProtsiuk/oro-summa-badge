@@ -4,12 +4,12 @@ namespace Summa\Bundle\BadgeBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Oro\Bundle\FormBundle\Model\UpdateHandler;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Summa\Bundle\BadgeBundle\Form\Handler\BadgeHandler;
 use Summa\Bundle\BadgeBundle\Form\Type\BadgeType;
 use Summa\Bundle\BadgeBundle\Entity\Badge;
@@ -18,12 +18,11 @@ class BadgeController extends AbstractController
 {
 
     /**
-     * @Route("/", name="summa_badge_index")
-     * @Template("SummaBadgeBundle:Badge:index.html.twig")
-     * @AclAncestor("summa_badge_view")
-     *
      * @return array
      */
+    #[\Symfony\Component\Routing\Attribute\Route(path: '/', name: 'summa_badge_index')]
+    #[Template('SummaBadgeBundle:Badge:index.html.twig')]
+    #[AclAncestor('summa_badge_view')]
     public function indexAction()
     {
         return [
@@ -32,40 +31,38 @@ class BadgeController extends AbstractController
     }
 
     /**
-     * @Route("/create", name="summa_badge_create")
-     * @Template("SummaBadgeBundle:Badge:update.html.twig")
-     * @AclAncestor("summa_badge_create")
-     *
      * @param Request $request
      * @return array
      */
+    #[\Symfony\Component\Routing\Attribute\Route(path: '/create', name: 'summa_badge_create')]
+    #[Template('SummaBadgeBundle:Badge:update.html.twig')]
+    #[AclAncestor('summa_badge_create')]
     public function createAction(Request $request)
     {
         return $this->update(new Badge(), $request);
     }
 
     /**
-     * @Route("/update/{id}", name="summa_badge_update", requirements={"id"="\d+"})
-     * @Template("SummaBadgeBundle:Badge:update.html.twig")
-     * @AclAncestor("summa_badge_update")
      *
      * @param Badge $badge
      * @param Request $request
      * @return array
      */
+    #[\Symfony\Component\Routing\Attribute\Route(path: '/update/{id}', name: 'summa_badge_update', requirements: ['id' => '\d+'])]
+    #[Template('SummaBadgeBundle:Badge:update.html.twig')]
+    #[AclAncestor('summa_badge_update')]
     public function updateAction(Badge $badge, Request $request)
     {
         return $this->update($badge, $request);
     }
 
     /**
-     * @Route("/view/{id}", name="summa_badge_view", requirements={"id"="\d+"})
-     * @AclAncestor("summa_badge_view")
-     * @Template("SummaBadgeBundle:Badge:view.html.twig")
-     *
      * @param Badge $badge
      * @return array
      */
+    #[\Symfony\Component\Routing\Attribute\Route(path: '/view/{id}', name: 'summa_badge_view', requirements: ['id' => '\d+'])]
+    #[AclAncestor('summa_badge_view')]
+    #[Template('SummaBadgeBundle:Badge:view.html.twig')]
     public function viewAction(Badge $badge)
     {
         return [
@@ -74,13 +71,12 @@ class BadgeController extends AbstractController
     }
 
     /**
-     * @Route("/info/{id}", name="summa_badge_info", requirements={"id"="\d+"})
-     * @AclAncestor("summa_badge_view")
-     * @Template("SummaBadgeBundle:Badge/widget:info.html.twig")
-     *
      * @param Badge $badge
      * @return array
      */
+    #[\Symfony\Component\Routing\Attribute\Route(path: '/info/{id}', name: 'summa_badge_info', requirements: ['id' => '\d+'])]
+    #[AclAncestor('summa_badge_view')]
+    #[Template('SummaBadgeBundle:Badge/widget:info.html.twig')]
     public function infoAction(Badge $badge)
     {
         return [
@@ -90,14 +86,14 @@ class BadgeController extends AbstractController
     }
 
     /**
-     * @Route("/delete/{id}", name="summa_badge_delete", requirements={"id"="\d+"})
      *
-     * @AclAncestor("summa_badge_delete")
-     * @Template()
      *
      * @param Badge $entity
      * @return array
      */
+    #[\Symfony\Component\Routing\Attribute\Route(path: '/delete/{id}', name: 'summa_badge_delete', requirements: ['id' => '\d+'])]
+    #[AclAncestor('summa_badge_delete')]
+    #[Template]
     public function deleteAction(int $id)
     {
         return true;
@@ -110,7 +106,7 @@ class BadgeController extends AbstractController
      */
     protected function update(Badge $badge, Request $request)
     {
-        return $this->get(UpdateHandler::class)->handleUpdate(
+        return $this->get(\Oro\Bundle\FormBundle\Model\UpdateHandlerFacade::class)->handleUpdate(
             $badge,
             $this->createForm(BadgeType::class, $badge),
             function (Badge $badge) {
@@ -132,13 +128,13 @@ class BadgeController extends AbstractController
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return array_merge(
             parent::getSubscribedServices(),
             [
                 TranslatorInterface::class,
-                UpdateHandler::class
+                \Oro\Bundle\FormBundle\Model\UpdateHandlerFacade::class
             ]
         );
     }

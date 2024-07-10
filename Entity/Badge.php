@@ -5,131 +5,80 @@ namespace Summa\Bundle\BadgeBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\CronBundle\Entity\ScheduleIntervalsAwareInterface;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Summa\Bundle\BadgeBundle\Model\ExtendBadge;
 
-/**
- * @ORM\Entity(repositoryClass="Summa\Bundle\BadgeBundle\Entity\Repository\BadgeRepository")
- * @ORM\Table(name="summa_badge")
- * @ORM\HasLifecycleCallbacks
- * @Config(
- *      routeName="summa_badge_index",
- *      routeView="summa_badge_view",
- *      defaultValues={
- *          "entity"={
- *              "icon"="fa-certificate"
- *          },
- *          "grid"={
- *              "default"="summa-badge-grid"
- *          },
- *          "security"={
- *              "type"="ACL",
- *              "group_name"="commerce",
- *          }
- *      }
- * )
- */
-class Badge extends ExtendBadge implements ScheduleIntervalsAwareInterface
+#[ORM\Entity(repositoryClass: \Summa\Bundle\BadgeBundle\Entity\Repository\BadgeRepository::class)]
+#[ORM\HasLifecycleCallbacks]
+#[Config(routeName: 'summa_badge_index', routeView: 'summa_badge_view', defaultValues: ['entity' => ['icon' => 'fa-certificate'], 'grid' => ['default' => 'summa-badge-grid'], 'security' => ['type' => 'ACL', 'group_name' => 'commerce']], '}')]
+#[ORM\Table(name: 'summa_badge')]
+class Badge implements ScheduleIntervalsAwareInterface, \Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface
 {
     const SUMMA_BADGE_POSITION = 'summa_badge_position';
+    use \Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     *
-     */
+    
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', name: 'id')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     protected $id;
 
-    /**
-     * @ORM\Column(type="string", length=150, nullable=false)
-     *
-     */
+    
+    #[ORM\Column(type: 'string', length: 150, nullable: false)]
     protected $name;
 
     /**
      * @var File
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\AttachmentBundle\Entity\File")
-     * @ORM\JoinColumn(name="image_id", referencedColumnName="id", onDelete="SET NULL")
      */
+    #[ORM\ManyToOne(targetEntity: \Oro\Bundle\AttachmentBundle\Entity\File::class)]
+    #[ORM\JoinColumn(name: 'image_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
     protected $image;
 
-    /**
-     * @ORM\Column(name="style", type="string", nullable=true)
-     */
+    #[ORM\Column(name: 'style', type: 'string', nullable: true)]
     protected $style;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
+    #[ORM\Column(type: 'boolean', nullable: true)]
     protected $active;
 
     /**
      * @var string
-     * @ORM\Column(name="product_assignment_rule", type="text", nullable=true)
      */
+    #[ORM\Column(name: 'product_assignment_rule', type: 'text', nullable: true)]
     protected $productAssignmentRule;
 
     /**
      * @var integer
-     * @ORM\Column(name="apply_for_n_days", type="integer", nullable=true)
      */
+    #[ORM\Column(name: 'apply_for_n_days', type: 'integer', nullable: true)]
     protected $applyForNDays;
 
     /**
      * @var BadgeSchedule[]|ArrayCollection
-     *
-     * @ORM\OneToMany(
-     *      targetEntity="Summa\Bundle\BadgeBundle\Entity\BadgeSchedule",
-     *      mappedBy="badge",
-     *      cascade={"persist"},
-     *      orphanRemoval=true
-     * )
-     * @ORM\OrderBy({"activeAt" = "ASC"})
      */
+    #[ORM\OneToMany(targetEntity: \Summa\Bundle\BadgeBundle\Entity\BadgeSchedule::class, mappedBy: 'badge', cascade: ['persist'], orphanRemoval: true)]
+    #[ORM\OrderBy(['activeAt' => 'ASC'])]
     protected $schedules;
 
     /**
      * @var bool
-     * @ORM\Column(name="contain_schedule", type="boolean")
      */
+    #[ORM\Column(name: 'contain_schedule', type: 'boolean')]
     protected $containSchedule = false;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="summa.productbadge.badge.created_at"
-     *          },
-     *          "importexport"={
-     *              "excluded"=true
-     *          }
-     *      }
-     * )
      */
+    #[ORM\Column(name: 'created_at', type: 'datetime')]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'summa.productbadge.badge.created_at'], 'importexport' => ['excluded' => true]])]
     protected $createdAt;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="updated_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="summa.productbadge.badge.updated_at"
-     *          },
-     *          "importexport"={
-     *              "excluded"=true
-     *          }
-     *      }
-     * )
      */
+    #[ORM\Column(name: 'updated_at', type: 'datetime')]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'summa.productbadge.badge.updated_at'], 'importexport' => ['excluded' => true]])]
     protected $updatedAt;
 
     /**
@@ -138,7 +87,6 @@ class Badge extends ExtendBadge implements ScheduleIntervalsAwareInterface
     public function __construct()
     {
         $this->schedules    = new ArrayCollection();
-        parent::__construct();
     }
 
     /**
@@ -375,9 +323,8 @@ class Badge extends ExtendBadge implements ScheduleIntervalsAwareInterface
 
     /**
      * Pre persist event handler.
-     *
-     * @ORM\PrePersist
      */
+    #[ORM\PrePersist]
     public function beforeSave()
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -386,9 +333,8 @@ class Badge extends ExtendBadge implements ScheduleIntervalsAwareInterface
 
     /**
      * Pre update event handler.
-     *
-     * @ORM\PreUpdate
      */
+    #[ORM\PreUpdate]
     public function doUpdate()
     {
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
